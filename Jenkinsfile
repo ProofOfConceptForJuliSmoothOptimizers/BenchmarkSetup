@@ -1,8 +1,8 @@
 pipeline {
   agent any
-  environment {
-    julia = "/opt/julia/bin/julia"
-  }
+  // environment {
+  //   julia = "/opt/julia/bin/julia"
+  // }
   options {
     skipDefaultCheckout true
   }
