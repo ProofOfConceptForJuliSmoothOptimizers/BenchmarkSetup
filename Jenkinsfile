@@ -1,8 +1,7 @@
+def bmarkFile = 'benchmarks.jl'
+
 pipeline {
   agent any
-  // environment {
-  //   julia = "/opt/julia/bin/julia"
-  // }
   options {
     skipDefaultCheckout true
   }
@@ -81,12 +80,16 @@ pipeline {
     }
     stage('run benchmarks') {
       steps {
+        script {
+          def data = env.comment.tokenize(' ')
+          if (data.size() > 2) {
+            bmarkFile = data.get(2);
+          }
+        }
         dir(WORKSPACE + "/$repo") {
-          sh '''
-          set -x
-          julia benchmark/send_comment_to_pr.jl -o $org -r $repo -p $pullrequest -c "Starting benchmarks!"
-          julia benchmark/run_benchmarks.jl
-          '''
+          sh "set -x"
+          sh "julia benchmark/send_comment_to_pr.jl -o $org -r $repo -p $pullrequest -c '**Starting benchmarks!**' "
+          sh "julia benchmark/run_benchmarks.jl $bmarkFile"
         }   
       }
     }
@@ -99,7 +102,7 @@ pipeline {
     }
     failure {
       dir(WORKSPACE + "/$repo") {
-        sh 'julia benchmark/send_comment_to_pr.jl -o $org -r $repo -p $pullrequest -c "An error has occured while running the benchmarks"'
+        sh "julia benchmark/send_comment_to_pr.jl -o $org -r $repo -p $pullrequest -c '**An error has occured while running the benchmarks in file $bmarkFile** '"
       }   
     }
     cleanup {
