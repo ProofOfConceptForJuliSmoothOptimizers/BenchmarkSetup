@@ -62,7 +62,6 @@ pipeline {
   stages {
     stage('pull from repository') {
       steps {
-        // TODO: dont hardcode repo url and make a variable for it
         sh 'git clone https://${GITHUB_AUTH}@github.com/$org/$repo.git'
         dir(WORKSPACE + "/$repo") {
             sh 'git checkout ' + BRANCH_NAME
