@@ -23,7 +23,7 @@ Voici les étapes à suivre:
 	1.  Issue comments
 	2. Pull requests
 
-5. Cliquer sur **Update webhook** et c'est terminé!
+5. Cliquer sur **Update webhook/Add webhook** et c'est terminé!
 
  Lorsqu'un nouveau dépôt est ajouté avec un nouveau token, jenkins a parfois du mal à se synchroniser. Il est donc judicieux de partir un build manuellement après avoir setup le webhook. Pour les prochaines fois, écrire un commentaire dans la pull request suffira. 
  

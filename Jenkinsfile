@@ -49,7 +49,7 @@ pipeline {
 
      causeString: 'Triggered on $comment',
 
-     token: "LDLFactorizations",
+     token: "",
 
      printContributedVariables: true,
      printPostContent: true,
@@ -77,10 +77,10 @@ pipeline {
           git checkout master
           git pull origin master
           git fetch origin
-          git branch -D $BRANCH_NAME
+          git branch -D $BRANCH_NAME || true
           git checkout -b $BRANCH_NAME origin/$BRANCH_NAME
-          '''    
-        }   
+          '''
+        }
       }
     }
     stage('run benchmarks') {
@@ -92,10 +92,8 @@ pipeline {
           }
         }
         dir(WORKSPACE + "/$repo") {
-          sh '''
-            mkdir -p $HOME/benchmarks/${repo}
-          '''
-          sh "qsub -N ${repo}_${pullrequest} -V -cwd -o $HOME/benchmarks/${repo}/${pull_request}_bmark_output.log -e $HOME/benchmarks/${repo}/${pull_request}_bmark_error.log push_benchmarks.sh $bmarkFile"
+          sh "mkdir -p $HOME/benchmarks/${org}/${repo}"
+          sh "qsub -N ${repo}_${pullrequest} -V -cwd -o $HOME/benchmarks/${org}/${repo}/${pullrequest}_bmark_output.log -e $HOME/benchmarks/${org}/${repo}/${pullrequest}_bmark_error.log push_benchmarks.sh $bmarkFile"
         }   
       }
     }
@@ -108,9 +106,9 @@ pipeline {
       dir(WORKSPACE + "/$repo") {
         sh 'printenv'
         sh '''
-          git clean -fd
-          git checkout master
-          git branch -D $BRANCH_NAME
+        git clean -fd
+        git checkout master
+        git branch -D $BRANCH_NAME || true
         '''
       }
     }
