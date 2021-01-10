@@ -18,10 +18,20 @@ function parse_commandline()
             arg_type = String
             default = "ProofOfConceptForJuliSmoothOptimizers"
         "--repo", "-r"
-            help = "The name of the repositories on GitHub"
+            help = "The name of the repositories on GitHub. To select all repos, simply write : 'all'."
             arg_type = String
-            default = "Krylov.jl"   
-        
+            default = "Krylov.jl"
+        "--delete", "-d"
+            help = "specifies if it's a deletion process"
+            action = :store_true
+        # TODO: change branch required to true
+        "--branch", "-b"
+            help = "the name of the new branch on which the modifications will be made."
+            arg_type = String   
+            required = false
+        "--file", "-f"
+            help = "path to file to update (e.g dir1/dir2/file_to_update.txt). 
+                    Make sure to use the '/' delimiter for the path."
     end
 
     return parse_args(s, as_symbols=true)
@@ -30,24 +40,7 @@ end
 """TODO: make sure to put 'branch_name' as an argument in ArgParse and to add it to all
     function that needs the paramater. Add it as a named parameter""" 
 
-function get_repo(api::GitHub.GitHubWebAPI, org::String, repo_name::String; kwargs...)
-    my_params = Dict(:visibility => "all")
-    # return GitHub.repo(api, repo; params = my_params, kwargs...)
-    return Repo(GitHub.gh_get_json(api, "/repos/$(org)/$(repo_name)"; params = my_params, kwargs...))
-end
-
-function update_file(api::GitHub.GitHubWebAPI, org::String, path::String; kwargs...)
-    repositories, pagedata = GitHub.repos(api, org; kwargs...)
-    file = open(path, "r")
-    myparams = Dict(:message => "updating file from remote script: $path", :branch => "master", :content => base64encode(file))
-    close(file)
-    [GitHub.update_file(api, repo, path; params = myparams , kwargs...) for repo in repositories]
-
-    println("Update Complete!")
-end
-
-function update_file(api::GitHub.GitHubWebAPI, org::String, path::String, repo_names::Vector{String}; kwargs...)
-    repositories = [get_repo(api, org, repo_name; kwargs...) for repo_name in repo_names]
+function update_file(api::GitHub.GitHubWebAPI, path::String, repositories::Vector{Repo}; kwargs...)
     file = open(path, "r")
     myparams = Dict(:message => "updating file from remote script: $path", :branch => "master", :content => base64encode(file))
     close(file)
@@ -62,14 +55,12 @@ function update_file(api::GitHub.GitHubWebAPI, org::String, path::String, repo_n
     end
 end
 
-# TODO: make that function work... 
-function delete_file(api::GitHub.GitHubWebAPI, org::String, path::String, repo_names::Vector{String}; kwargs...)
+function delete_file(api::GitHub.GitHubWebAPI, path::String, repos::Vector{Repo}; kwargs...)
     # Getting sha of the file if needed:
     myparams = Dict(:message => "deleting file from remote script: $path", :branch => "master")
     # Looking for the git sha1 of the file to delete:
-    repositories = [get_repo(api, org, repo_name; kwargs...) for repo_name in repo_names]
 
-    for repo in repositories
+    for repo in repos
         sha_of_file = get_file_sha(api, path, repo)
         if length(sha_of_file) > 0
            myparams[:sha] = sha_of_file
@@ -82,10 +73,15 @@ function delete_file(api::GitHub.GitHubWebAPI, org::String, path::String, repo_n
 end
 
 function get_file_sha(api::GitHub.GitHubWebAPI , path_to_file::String, repo::Repo, branch_name = "master"; kwargs...)
-
-    myparams = Dict(:ref => branch_name)
-    remote_file = file(api, repo, path_to_file; params = myparams, kwargs...)
-    println(remote_file)
+    remote_file = nothing
+    try
+        myparams = Dict(:ref => branch_name)
+        remote_file = file(api, repo, path_to_file; params = myparams, kwargs...)
+    catch exception
+        println("file not found in repository")
+        
+        return ""
+    end
 
     return String(remote_file.sha)
 end
@@ -98,30 +94,31 @@ function main()
     api = GitHub.DEFAULT_API
     # Need to add GITHUB_AUTH to your .bashrc
     myauth = GitHub.authenticate("99c2656683ba93a4f3cb2f01494bcd1bcc416545")
-    # parse the arguments: 
+    # parse the arguments:
+
     parsed_args = parse_commandline()
     org = parsed_args[:org]
     repo_names = parsed_args[:repo]
-    # creating/updating file in each repo
-    repositories, pagedata = GitHub.repos(api, org; auth = myauth)
-    path_to_file = joinpath("test.txt")
-    
-    # To add a file:
+    is_delete = parsed_args[:delete]
+    new_branch_name = parsed_args[:branch]
 
-    if repo_names == "*"
-        update_file(api, org, path_to_file; auth = myauth)
+    """" TODO: fix path behaviour
+    for now, when given a path like this: './dir1/dir2/file', joinpath does not give the right path
+    However, giving 'dir1/dir2/file' works just fine.
+    """
+
+    path_to_file = joinpath(split(parsed_args[:file], '/')...) 
+
+    path_to_file = parsed_args[:file]
+    # getting the right repositories given as argument: 
+
+    repositories = repo_names == "all" ? GitHub.repos(api, org; auth = myauth)[1] : [repo for repo in GitHub.repos(api, org; auth = myauth)[1] if repo.name in split(repo_names)]
+    
+    if is_delete
+        delete_file(api, path_to_file, repositories, auth = myauth)
     else
-        repo_names = [String(repo_name) for repo_name in split(repo_names)]
-        update_file(api, org, path_to_file, repo_names; auth = myauth)
-        println("Update Done!")
+        update_file(api, path_to_file, repositories; auth = myauth)
     end
-
-    # To delete a file: 
-
-    # repo_names = [String(repo_name) for repo_name in split(repo_names)]
-    # delete_file(api, org, path_to_file, repo_names, auth = myauth)
-
-    
 end
 
 main()
