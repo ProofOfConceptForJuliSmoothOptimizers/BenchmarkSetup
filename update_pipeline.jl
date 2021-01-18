@@ -32,7 +32,7 @@ function parse_commandline()
             help = "The name of an existing branch. 'master' is the default value."
             default = "master"
         "--file", "-f"
-            help = "path to file to update (e.g dir1/dir2/file_to_update.txt). 
+            help = "path to file to update (e.g dir1/dir2/file_to_update.txt and not ./dir1/dir2/file_to_update.txt). 
                     Make sure to use the '/' delimiter for the path."
         "--message", "-m"
             help = "Commit message describing the modification."
@@ -52,7 +52,8 @@ function update_file(api::GitHub.GitHubWebAPI, path::String, repositories::Vecto
     myparams = Dict(:branch => new_branch_name, :message => message,  :content => base64encode(file))
     close(file)
     for repo in repositories
-        sha_of_file = get_file_sha(api, path, repo)
+        sha_of_file = get_file_sha(api, path, repo, new_branch_name)
+        println(path)
         if length(sha_of_file) > 0
            myparams[:sha] = sha_of_file
         end 
@@ -68,22 +69,24 @@ function delete_file(api::GitHub.GitHubWebAPI, path::String, repos::Vector{Repo}
     # Looking for the git sha1 of the file to delete:
 
     for repo in repos
-        sha_of_file = get_file_sha(api, path, repo)
+        sha_of_file = get_file_sha(api, path, repo, new_branch_name)
+        println(sha_of_file)
         if length(sha_of_file) > 0
            myparams[:sha] = sha_of_file
         end 
-        GitHub.delete_file(api, repo, path; params = myparams, kwargs...)
+        # TODO: handle errors when the file to delete does not exist remotely
+        GitHub.delete_file(api, repo, path; params = myparams, handle_error = false, kwargs...)
         println("file at $(path) deleted in $(repo.name)")
         delete!(myparams, :sha)
     end
     println("Deletion Complete!")
 end
 
-function get_file_sha(api::GitHub.GitHubWebAPI , path_to_file::String, repo::Repo, branch_name = "master"; kwargs...)
+function get_file_sha(api::GitHub.GitHubWebAPI , path::String, repo::Repo, branch_name::String; kwargs...)
     remote_file = nothing
     try
         myparams = Dict(:ref => branch_name)
-        remote_file = file(api, repo, path_to_file; params = myparams, kwargs...)
+        remote_file = file(api, repo, path; params = myparams, kwargs...)
     catch exception
         println("file not found in repository")
         
@@ -93,37 +96,98 @@ function get_file_sha(api::GitHub.GitHubWebAPI , path_to_file::String, repo::Rep
     return String(remote_file.sha)
 end
 
-function create_pullrequest(api::GitHub.GitHubWebAPI, repository::Repo, new_branch_name::String, base_branch::String, message::String; kwargs...)
-
-    myparams = Dict(:head => new_branch_name, :base => base_branch, :title => message)
-
-    GitHub.create_pull_request(api, repository; params = myparams, kwargs...)
-end
-
-function create_pullrequests(api::GitHub.GitHubWebAPI, repositories::Vector{Repo}, new_branch_name::String, base_branch::String, message::String; kwargs...)
+function create_pullrequests(api::GitHub.GitHubWebAPI, org::String, repositories::Vector{Repo}, new_branch_name::String, base_branch_name::String, message::String; kwargs...)
     
-    [create_pullrequest(api, repository, new_branch_name, base_branch, message; kwargs...) for repository in repositories]
+    [create_pullrequest(api, org, repository, new_branch_name, base_branch_name, message; kwargs...) for repository in repositories]
 end
 
+function create_pullrequest(api::GitHub.GitHubWebAPI, org::String, repository::Repo, new_branch_name::String, base_branch_name::String, message::String; kwargs...)
+
+    create_branch(api, org, repository, new_branch_name, base_branch_name; kwargs...)
+    myparams = Dict(:head => new_branch_name, :base => base_branch_name, :title => message)
+
+    # check if pr exists
+    is_new_pr, pr_number = is_new_pullrequest(api, org, repository, new_branch_name, base_branch_name; kwargs...)
+    if is_new_pr
+        GitHub.create_pull_request(api, repository; params = myparams, kwargs...)
+    else
+        GitHub.update_pull_request(api, repository, pr_number; params = myparams, kwargs...)
+    end
+end
+
+function is_new_pullrequest(api::GitHub.GitHubWebAPI, org::String, repository::Repo, new_branch_name::String, base_branch_name::String; kwargs...)
+    myparams = Dict(:base => base_branch_name, :state => "open", :org => org)
+    # getting array of pull requests
+    prs = pull_requests(api, repository; params = myparams, kwargs...)[1]
+    pr_idx = findfirst(pr -> pr.head.ref == new_branch_name, prs)
+    if isnothing(pr_idx)
+        return true, -1 
+    end
+
+    return false, prs[pr_idx].number
+end
 # TODO: make this method smart enough to detect if the new branch exists already
-function create_branch(api::GitHub.GitHubWebAPI, org::String, repository::Repo, new_branch_name::String, base_branch::String; kwargs...)
-    base_branch_sha = get_branch_sha(api::GitHub.GitHubWebAPI, org::String, repository::Repo, base_branch::String; kwargs...)
-    myparams = Dict(:ref => "refs/heads/$new_branch_name", :sha => base_branch_sha)
+function create_branch(api::GitHub.GitHubWebAPI, org::String, repository::Repo, new_branch_name::String, base_branch_name::String; kwargs...)
+    if is_new_branch(api, org, repository, new_branch_name; kwargs...)
+        base_branch_sha = get_branch_sha(api, org, repository, new_branch_name; kwargs...)
+        println("sha: $base_branch_sha")
+        die()
+        myparams = Dict(:ref => "refs/heads/$new_branch_name", :sha => base_branch_sha)
 
-    result = GitHub.gh_post_json(api, "/repos/$org/$(repository.name)/git/refs"; params = myparams, kwargs...)
+        result = GitHub.gh_post_json(api, "/repos/$org/$(repository.name)/git/refs"; params = myparams, kwargs...)
+    else
+        println("The branch already exists!")
+    end
 end
 
-function create_branches(api::GitHub.GitHubWebAPI, org::String, repositories::Vector{Repo}, new_branch_name::String, base_branch::String; kwargs...)
-
-    [create_branch(api, org, repository, new_branch_name, base_branch; kwargs...) for repository in repositories]
+function is_new_branch(api::GitHub.GitHubWebAPI, org::String, repository::Repo, branch_name::String; kwargs...)
+    
+    return isempty(find_matching_branches(api, org, repository, branch_name; kwargs...))
 end
 
-function get_branch_sha(api::GitHub.GitHubWebAPI, org::String, repository::Repo, base_branch::String; kwargs...) 
-    base_branch_dict = GitHub.gh_get_json(api, "/repos/$org/$(repository.name)/git/ref/heads/$base_branch"; kwargs...)
+function find_matching_branches(api::GitHub.GitHubWebAPI, org::String, repository::Repo, branch_name::String; kwargs...)
+   
+    return GitHub.gh_get_json(api, "/repos/$org/$(repository.name)/git/matching-refs/heads/$branch_name"; kwargs...)
+end
+
+function get_branch_sha(api::GitHub.GitHubWebAPI, org::String, repository::Repo, base_branch_name::String; kwargs...) 
+    base_branch_dict = GitHub.gh_get_json(api, "/repos/$org/$(repository.name)/git/ref/heads/$base_branch_name"; kwargs...)
     
     return base_branch_dict["object"]["sha"]
 end
 
+function get_file_paths(path::String)
+
+    !isdir(joinpath(".", path)) && return [format_path(normpath(path))] 
+
+    file_paths = String[]
+    for (root, dirs, files) in walkdir(joinpath(".", path))
+        for dir in dirs
+            get_file_paths(joinpath(root, dir), file_paths)
+        end
+        for file in files
+            push!(file_paths, normpath(root, file))
+        end 
+    end
+    return [format_path(file_path) for file_path in file_paths]
+end
+
+function get_file_paths(path::String, file_paths::Vector{String})
+   
+    for (root, dirs, files) in walkdir(joinpath(".", path))
+        for dir in dirs
+            get_file_paths(joinpath(root, dir), file_paths)
+        end
+        for file in files
+            push!(file_paths, normpath(root, file))
+        end 
+    end
+end
+
+function format_path(path::String)
+
+    return replace(path, "\\" => "/")
+end
 
 function main()
     api = GitHub.DEFAULT_API
@@ -135,15 +199,20 @@ function main()
     org = parsed_args[:org]
     repo_names = parsed_args[:repo]
     is_delete = parsed_args[:delete]
-    new_branch = parsed_args[:new_branch]
-    base_branch = parsed_args[:base_branch]
+    new_branch_name = parsed_args[:new_branch]
+    base_branch_name = parsed_args[:base_branch]
     message = parsed_args[:message]
+    path = parsed_args[:file]
 
     # Debug:
-
-    new_branch_name = "test-br"
-    file = "dir1/test.txt"
+    org = "ProofOfConceptForJuliSmoothOptimizers"
+    repo_names = "Krylov.jl"
     is_delete = false
+    new_branch_name = "test-br"
+    base_branch_name = "master"
+    path = "benchmark"
+    message = "updating/deleting files from remote script: $(format_path(normpath(path)))"
+    is_delete = true
 
     """" TODO: fix path behaviour
     for now, when given a path like this: './dir1/dir2/file', joinpath does not give the right path
@@ -152,24 +221,23 @@ function main()
     
     # assigning default value to commit message: 
 
-    message = isnothing(message) ?  "updating/deleting file from remote script: $path" : message
+    message = isnothing(message) ?  "updating/deleting files from remote script: $path" : message
 
-    path_to_file = parsed_args[:file]
     # getting the right repositories given as argument: 
 
     repositories = repo_names == "all" ? GitHub.repos(api, org; auth = myauth)[1] : [repo for repo in GitHub.repos(api, org; auth = myauth)[1] if repo.name in split(repo_names)]
     
-    # creating new branches for each repo.
-    create_branches(api, org, repositories, new_branch_name, base_branch; auth = myauth)
+    file_paths = get_file_paths(path)
+    println(file_paths)
 
     if is_delete
-        delete_file(api, path_to_file, repositories, new_branch, message, auth = myauth)
+        [delete_file(api, file_path, repositories, new_branch_name, message, auth = myauth) for file_path in file_paths]
     else
-        update_file(api, path_to_file, repositories, new_branch, message; auth = myauth)
+        [update_file(api, file_path, repositories, new_branch_name, message; auth = myauth) for file_path in file_paths]
     end
     
-    # creating pull request 
-    create_pullrequests(api, repositories, new_branch, base_branch, message; auth = myauth)
+    # creating pull request and branches if needed
+    create_pullrequests(api, org, repositories, new_branch_name, base_branch_name, message; auth = myauth)
 end
 
 main()
