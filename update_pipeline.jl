@@ -1,5 +1,5 @@
 using Pkg
-bmark_dir = joinpath(@__DIR__, "env")
+bmark_dir = joinpath(".")
 Pkg.activate(bmark_dir)
 Pkg.instantiate()
 
