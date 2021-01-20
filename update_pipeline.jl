@@ -38,7 +38,6 @@ function parse_commandline()
             help = "Commit message describing the modification."
             arg_type = String
             required = false
-
     end
 
     return parse_args(s, as_symbols=true)
@@ -103,7 +102,7 @@ end
 
 function create_pullrequest(api::GitHub.GitHubWebAPI, org::String, repository::Repo, new_branch_name::String, base_branch_name::String, message::String; kwargs...)
 
-    create_branch(api, org, repository, new_branch_name, base_branch_name; kwargs...)
+    # create_branch(api, org, repository, new_branch_name, base_branch_name; kwargs...)
     myparams = Dict(:head => new_branch_name, :base => base_branch_name, :title => message)
 
     # check if pr exists
@@ -129,9 +128,7 @@ end
 # TODO: make this method smart enough to detect if the new branch exists already
 function create_branch(api::GitHub.GitHubWebAPI, org::String, repository::Repo, new_branch_name::String, base_branch_name::String; kwargs...)
     if is_new_branch(api, org, repository, new_branch_name; kwargs...)
-        base_branch_sha = get_branch_sha(api, org, repository, new_branch_name; kwargs...)
-        println("sha: $base_branch_sha")
-        die()
+        base_branch_sha = get_branch_sha(api, org, repository, base_branch_name; kwargs...)
         myparams = Dict(:ref => "refs/heads/$new_branch_name", :sha => base_branch_sha)
 
         result = GitHub.gh_post_json(api, "/repos/$org/$(repository.name)/git/refs"; params = myparams, kwargs...)
@@ -151,9 +148,13 @@ function find_matching_branches(api::GitHub.GitHubWebAPI, org::String, repositor
 end
 
 function get_branch_sha(api::GitHub.GitHubWebAPI, org::String, repository::Repo, base_branch_name::String; kwargs...) 
-    base_branch_dict = GitHub.gh_get_json(api, "/repos/$org/$(repository.name)/git/ref/heads/$base_branch_name"; kwargs...)
-    
-    return base_branch_dict["object"]["sha"]
+    try    
+        base_branch_dict = GitHub.gh_get_json(api, "/repos/$org/$(repository.name)/git/ref/heads/$base_branch_name"; kwargs...)
+
+        return base_branch_dict["object"]["sha"]
+    catch exception
+        println("Error trying to find Base branch. Make sure the base branch exists!")
+    end
 end
 
 function get_file_paths(path::String)
@@ -207,10 +208,10 @@ function main()
     # Debug:
     org = "ProofOfConceptForJuliSmoothOptimizers"
     repo_names = "Krylov.jl"
-    is_delete = false
+    is_delete = true
     new_branch_name = "test-br"
     base_branch_name = "master"
-    path = "benchmark"
+    path = "README.md"
     message = "updating/deleting files from remote script: $(format_path(normpath(path)))"
     is_delete = true
 
@@ -230,6 +231,7 @@ function main()
     file_paths = get_file_paths(path)
     println(file_paths)
 
+    [create_branch(api, org, repository, new_branch_name, base_branch_name; auth = myauth) for repository in repositories]
     if is_delete
         [delete_file(api, file_path, repositories, new_branch_name, message, auth = myauth) for file_path in file_paths]
     else
