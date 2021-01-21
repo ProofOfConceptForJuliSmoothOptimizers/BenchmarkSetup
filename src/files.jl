@@ -5,7 +5,6 @@ function update_file(api::GitHub.GitHubWebAPI, path::String, repositories::Vecto
     close(file)
     for repo in repositories
         sha_of_file = get_file_sha(api, path, repo, new_branch_name)
-        println(path)
         if length(sha_of_file) > 0
            myparams[:sha] = sha_of_file
         end 
@@ -22,7 +21,6 @@ function delete_file(api::GitHub.GitHubWebAPI, path::String, repos::Vector{Repo}
 
     for repo in repos
         sha_of_file = get_file_sha(api, path, repo, new_branch_name)
-        println(sha_of_file)
         if length(sha_of_file) > 0
            myparams[:sha] = sha_of_file
         end 

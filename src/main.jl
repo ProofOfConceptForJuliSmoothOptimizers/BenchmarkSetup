@@ -17,6 +17,7 @@ include(joinpath(@__DIR__,"files.jl"))
 include(joinpath(@__DIR__,"branches.jl"))
 include(joinpath(@__DIR__,"pull_requests.jl"))
 include(joinpath(@__DIR__,"utils.jl"))
+include(joinpath(@__DIR__,"webhooks.jl"))
 
 function parse_commandline()
     s = ArgParseSettings()
@@ -30,7 +31,7 @@ function parse_commandline()
             arg_type = String
             default = "Krylov.jl"
         "--delete", "-d"
-            help = "specifies if it's a deletion process."
+            help = "boolean that specifies if it's a deletion process."
             action = :store_true
         "--new_branch", "-b"
             help = "the name of the new branch on which the modifications will be made. It must be a new branch name."
@@ -46,6 +47,9 @@ function parse_commandline()
             help = "Commit message describing the modification."
             arg_type = String
             required = false
+        "--webhook", "-w"
+            help = "boolean that triggers the setup of webhooks for the benchmarks."
+            action = :store_true
     end
 
     return parse_args(s, as_symbols=true)
@@ -54,7 +58,8 @@ end
 function main()
     api = GitHub.DEFAULT_API
     # Need to add GITHUB_AUTH to your .bashrc
-    myauth = GitHub.authenticate("99c2656683ba93a4f3cb2f01494bcd1bcc416545")
+    # myauth = GitHub.authenticate("99c2656683ba93a4f3cb2f01494bcd1bcc416545")
+    myauth = GitHub.authenticate(ENV["JSO_GITHUB_AUTH"])
     # parse the arguments:
 
     parsed_args = parse_commandline()
@@ -65,6 +70,7 @@ function main()
     base_branch_name = parsed_args[:base_branch]
     message = parsed_args[:message]
     path = parsed_args[:file]
+    is_webhook = parsed_args[:webhook]
 
     # assigning default value to commit message: 
 
@@ -75,9 +81,14 @@ function main()
     repositories = repo_names == "all" ? GitHub.repos(api, org; auth = myauth)[1] : [repo for repo in GitHub.repos(api, org; auth = myauth)[1] if repo.name in split(repo_names)]
     
     file_paths = get_file_paths(path)
-    println(file_paths)
 
+    # create branches
     [create_branch(api, org, repository, new_branch_name, base_branch_name; auth = myauth) for repository in repositories]
+    # create webhooks for benchmarks
+    if is_webhook
+        [create_benchmark_webhook(api, org, repository; auth = myauth) for repository in repositories]
+    end
+    # updating or deleting files given in path
     if is_delete
         [delete_file(api, file_path, repositories, new_branch_name, message, auth = myauth) for file_path in file_paths]
     else
