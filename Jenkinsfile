@@ -1,4 +1,4 @@
-def bmarkFile = 'benchmarks.jl'
+def bmarkFile = 'run_benchmarks.jl'
 pipeline {
   agent any
   environment {
