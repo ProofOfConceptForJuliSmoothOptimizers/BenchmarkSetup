@@ -8,7 +8,7 @@ using Git
 using GitHub
 using JSON
 using Base64
-
+using GitCommand
 
 # include -------
 
@@ -74,7 +74,7 @@ function main()
 
     # assigning default value to commit message: 
 
-    message = (isnothing(message) || "") ?  "setting up benchmarks" : message
+    message = (isnothing(message) || message == "") ?  "setting up benchmarks" : message
 
     # getting the right repositories given as argument: 
 
@@ -85,6 +85,7 @@ function main()
     if is_webhook
         [create_benchmark_webhook(api, org, repository; auth = myauth) for repository in repositories]
     end
+    println("Webhook setup done ✔")
 end
 
 main()

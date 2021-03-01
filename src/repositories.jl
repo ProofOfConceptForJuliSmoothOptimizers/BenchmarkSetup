@@ -15,7 +15,8 @@ function setup_benchmarks(api::GitHub.GitHubWebAPI, org::String, repositories::V
         Pkg.activate("..")
     end
     [update_file(api, file_path, repositories, new_branch_name, "adding/updating file: $file_path"; kwargs...) for file_path in file_paths]
-    create_pullrequests(api, org, repositories, new_branch_name, base_branch_name, message; auth = myauth)
+    create_pullrequests(api, org, repositories, new_branch_name, base_branch_name, message; kwargs...)
+    println("setting up benchmarks for repositories done ✔")
 end
 
 function clone_repo(repository::Repo)
