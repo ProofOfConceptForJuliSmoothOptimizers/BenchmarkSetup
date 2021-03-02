@@ -39,9 +39,10 @@ function populate_environment(repository::Repo, new_branch_name::String)
     end
     Pkg.activate(joinpath("benchmark"))
     Pkg.add(bmark_dependencies)
+    [println(dependency, " added ✔") for dependency in bmark_dependencies]
     Pkg.update()
-    Pkg.instantiate()
     Pkg.resolve()
+    Pkg.instantiate()
     try
         git() do git
             run(`$git add benchmark/Project.toml`)
