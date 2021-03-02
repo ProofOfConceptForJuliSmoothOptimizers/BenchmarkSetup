@@ -4,7 +4,7 @@ println(@__DIR__)
 Pkg.activate(bmark_dir)
 Pkg.resolve()
 Pkg.instantiate()
-repo_name = split(ARGS[1], ".")[1]
+repo_name = "$(split(ARGS[1], ".")[1])"
 bmarkname = lowercase(repo_name)
 using Git
 
