@@ -2,7 +2,7 @@
 
 julia benchmark/send_comment_to_pr.jl -o $org -r $repo -p $pullrequest -c '**Starting benchmarks!**'  
 
-julia "benchmark/$1 $2"
+julia benchmark/$1 $2
 
 if [ "$?" -eq "0" ] ; then
     julia benchmark/send_comment_to_pr.jl -o $org -r $repo -p $pullrequest -g
