@@ -5,7 +5,6 @@ end
 
 function create_pullrequest(api::GitHub.GitHubWebAPI, org::String, repository::Repo, new_branch_name::String, base_branch_name::String, message::String; kwargs...)
 
-    # create_branch(api, org, repository, new_branch_name, base_branch_name; kwargs...)
     myparams = Dict(:head => new_branch_name, :base => base_branch_name, :title => message)
 
     # check if pr exists

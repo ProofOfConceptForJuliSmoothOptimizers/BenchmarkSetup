@@ -79,6 +79,7 @@ function main()
     # get file paths:
     file_paths = get_file_paths(path)
     # update or delete: 
+    [create_branch(api, org, repository, new_branch_name, base_branch_name; auth = myauth) for repository in repositories]
     if is_delete
         [delete_file(api, file_path, repositories, new_branch_name, "deleting file: $file_path"; auth = myauth) for file_path in file_paths]
     else
@@ -91,8 +92,8 @@ function main()
     # create webhooks
     if is_webhook
         [create_benchmark_webhook(api, org, repository; auth = myauth) for repository in repositories]
+        println("Webhook setup done ✔")
     end
-    println("Webhook setup done ✔")
 end
 
 main()
