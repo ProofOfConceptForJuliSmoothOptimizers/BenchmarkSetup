@@ -30,9 +30,9 @@ function parse_commandline()
             help = "The name of the repositories on GitHub. To select all repos, simply write : 'all'."
             arg_type = String
             default = "Krylov.jl"
-        # "--delete", "-d"
-        #     help = "boolean that specifies if it's a deletion process."
-        #     action = :store_true
+        "--delete", "-d"
+            help = "boolean that specifies if it's a deletion process."
+            action = :store_true
         "--new_branch", "-b"
             help = "the name of the new branch on which the modifications will be made. It must be a new branch name."
             arg_type = String   
@@ -44,10 +44,10 @@ function parse_commandline()
             help = "path to file to update (e.g dir1/dir2/file_to_update.txt and not ./dir1/dir2/file_to_update.txt). 
                     Make sure to use the '/' delimiter for the path."
             required = false
-        "--message", "-m"
+        "--title", "-t"
             help = "pull request title"
             arg_type = String
-            required = false
+            default = "Setting up benchmarks"
         "--webhook", "-w"
             help = "boolean that triggers the setup of webhooks for the benchmarks."
             action = :store_true
@@ -59,29 +59,36 @@ end
 function main()
     api = GitHub.DEFAULT_API
     # Need to add GITHUB_AUTH to your .bashrc
-    # myauth = GitHub.authenticate("99c2656683ba93a4f3cb2f01494bcd1bcc416545")
     myauth = GitHub.authenticate(ENV["JSO_GITHUB_AUTH"])
     # parse the arguments:
 
     parsed_args = parse_commandline()
     org = parsed_args[:org]
+    is_delete = parsed_args[:delete]
     repo_names = parsed_args[:repo]
     new_branch_name = parsed_args[:new_branch]
     base_branch_name = parsed_args[:base_branch]
-    message = parsed_args[:message]
+    title = parsed_args[:title]
     path = parsed_args[:file]
     is_webhook = parsed_args[:webhook]
-
-    # assigning default value to commit message: 
-
-    message = (isnothing(message) || message == "") ?  "setting up benchmarks" : message
 
     # getting the right repositories given as argument: 
 
     repositories = repo_names == "all" ? GitHub.repos(api, org; auth = myauth)[1] : [repo for repo in GitHub.repos(api, org; auth = myauth)[1] if repo.name in split(repo_names)]
     
-    setup_benchmarks(api, org, repositories, new_branch_name, base_branch_name, message; auth = myauth)
-    # create webhooks for benchmarks
+    # get file paths:
+    file_paths = get_file_paths(path)
+    # update or delete: 
+    if is_delete
+        [delete_file(api, file_path, repositories, new_branch_name, "deleting file: $file_path"; auth = myauth) for file_path in file_paths]
+    else
+        [update_file(api, file_path, repositories, new_branch_name, "adding/updating file: $file_path"; auth = myauth) for file_path in file_paths]
+    end
+
+    # setup PRs: 
+    create_pullrequests(api, org, repositories, new_branch_name, base_branch_name, title; auth = myauth)
+
+    # create webhooks
     if is_webhook
         [create_benchmark_webhook(api, org, repository; auth = myauth) for repository in repositories]
     end
