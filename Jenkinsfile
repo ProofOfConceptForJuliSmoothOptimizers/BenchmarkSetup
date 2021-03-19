@@ -108,7 +108,6 @@ pipeline {
         sh '''
         git clean -fd
         git checkout master
-        git branch -D $BRANCH_NAME || true
         '''
       }
     }

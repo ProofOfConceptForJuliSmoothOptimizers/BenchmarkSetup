@@ -68,11 +68,13 @@ function main()
 
     repositories = repo_names == "all" ? GitHub.repos(api, org; auth = myauth)[1] : [repo for repo in GitHub.repos(api, org; auth = myauth)[1] if repo.name in split(repo_names)]
     
-    setup_benchmarks(api, org, repositories, new_branch_name, base_branch_name, message; auth = myauth)
+    setup_benchmarks(api, org, repositories, new_branch_name, base_branch_name, title; auth = myauth)
     # create webhooks for benchmarks
     if is_webhook
         [create_benchmark_webhook(api, org, repository; auth = myauth) for repository in repositories]
+        println("Webhook setup done ✔")
     end
-    println("Webhook setup done ✔")
-
+    println("setting benchmarks done!")
 end
+
+main()
