@@ -32,7 +32,7 @@ Make sure you have all the necessary files on your branch and on the master bran
 
 **Verify that the `token` variable in the Jenkinsfile has the same value as the token in the payload url of the webhook.**
 
-After connecting to the Jenkins server, make sure that you see your repository. If you can't find it, click on the `Scan repository now`.
+After connecting to the Jenkins server, make sure that you see your repository. If you can't find it, click on the `Scan Organization Now`.
 
 <p>
     <img src="images/image2.png">
