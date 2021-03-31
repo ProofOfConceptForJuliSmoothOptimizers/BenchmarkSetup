@@ -10,8 +10,9 @@ function create_branch(api::GitHub.GitHubWebAPI, org::String, repository::Repo, 
 end
 
 function is_new_branch(api::GitHub.GitHubWebAPI, org::String, repository::Repo, branch_name::String; kwargs...)
-    
-    return isempty(find_matching_branches(api, org, repository, branch_name; kwargs...))
+    refs = map(x-> x["ref"], find_matching_branches(api, org, repository, branch_name; kwargs...))
+
+    return !any(x ->  x == "refs/heads/$branch_name", refs)
 end
 
 function find_matching_branches(api::GitHub.GitHubWebAPI, org::String, repository::Repo, branch_name::String; kwargs...)

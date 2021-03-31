@@ -35,7 +35,7 @@ function populate_environment(repository::Repo, new_branch_name::String)
     cd(joinpath(repository.name))
     git() do git
         run(`$git pull origin`)
-        run(`$git checkout $new_branch_name`)
+        run(`$git checkout $new_branch_name --`)
     end
     Pkg.activate(joinpath("benchmark"))
     Pkg.add(bmark_dependencies)
