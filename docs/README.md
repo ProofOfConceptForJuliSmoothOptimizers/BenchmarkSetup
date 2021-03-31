@@ -44,7 +44,7 @@ After clicking on your repository, you should be able to see your branch. If you
     <img src="images/image3.png">
 </p>
 
-After clicking on your branch, make sure to run the build manually by clicking `Build Now`.
+After clicking on your branch, make sure to run the **first** build manually by clicking `Build Now`. Only the first build has to be run manually.
 
 <p>
     <img src="images/image4.png">
