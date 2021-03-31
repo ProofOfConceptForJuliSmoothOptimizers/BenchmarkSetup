@@ -80,8 +80,10 @@ If you wish to these modules manually, execute the following in the julia REPL:
 
 ```
 using Pkg
+Pkg.activate("REPO_PATH/benchmark")
 Pkg.add(["PkgBenchmark", "BenchmarkTools", "JLD2", "DataFrames", "ArgParse", "Git", "GitHub", "JSON", "Plots", "SolverBenchmark"])
 ```
+`REPO_PATH` should be the relative or absolute path of the root folder of your repository (e.g `./MyModule.jl`).
 
 JSOBot also requires a webhook to be set up for the repository that needs to benchmarked. You can set up the webhook manually [here](webhook_setup.md).
 
