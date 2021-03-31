@@ -32,7 +32,7 @@ Make sure you have all the necessary files on your branch and on the master bran
 
 **Verify that the `token` variable in the Jenkinsfile has the same value as the token in the payload url of the webhook.**
 
-After connecting to the Jenkins server, make sure that you see your repository. If you can't find it, click on the `Scan repository now`.
+After connecting to the Jenkins server, make sure that you see your repository. If you can't find it, click on the `Scan Organization Now`.
 
 <p>
     <img src="images/image2.png">
@@ -44,7 +44,7 @@ After clicking on your repository, you should be able to see your branch. If you
     <img src="images/image3.png">
 </p>
 
-After clicking on your branch, make sure to run the build manually by clicking `Build Now`.
+After clicking on your branch, make sure to run the **first** build manually by clicking `Build Now`. Only the first build has to be run manually.
 
 <p>
     <img src="images/image4.png">
