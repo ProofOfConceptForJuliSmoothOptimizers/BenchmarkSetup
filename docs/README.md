@@ -18,7 +18,11 @@ To set up JSOBot on your julia module, simply clone this [repository](https://gi
 
 In `BenchmarkSetup`, run: 
 
-`julia src/setup_benchmarks.jl --org ${your_organization} --repo ${your_repo} --new_branch ${branch_name} --title {pr_title} --webhook`
+```
+cd ~/BenchmarkSetup
+julia src/setup_benchmarks.jl --org ${your_organization} --repo ${your_repo} --new_branch ${branch_name} --title {pr_title} --webhook
+```
+
 
 If you want to setup the webhooks manually, simply omit the `--webhook` argument and follow [this guide](webhook_setup.md).
 
