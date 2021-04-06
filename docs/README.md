@@ -5,7 +5,7 @@ JSOBot is the new member of the organization that will be able to benchmark any 
 
 ## What does it do?
 
-JSOBot's most basic function is to benchmark a repository by comparing a branch to the master. This way, the developers can easily check if the new changes made are having an impact on the the performances of the given module.
+JSOBot's most basic function is to benchmark a repository by comparing a branch to the master. This way, the developers can easily check if the new changes made are having an impact on the performance of the given module.
 
 **The bot will always compare the latest commit of the current branch with the lastest version of the master branch.**
 
@@ -16,7 +16,7 @@ JSOBot's most basic function is to benchmark a repository by comparing a branch 
 
 To set up JSOBot on your julia module, simply clone this [repository](https://github.com/ProofOfConceptForJuliSmoothOptimizers/BenchmarkSetup).
 
-In `BenchmarkSetup`, run: 
+Simply run: 
 
 ```
 cd ~/BenchmarkSetup
@@ -78,9 +78,11 @@ It is necessary for a module to have a `benchmark` folder. That folder needs to 
 2. `run_benchmarks.jl` to run the benchmarks.
 3. `send_comment_to_pr.jl`. This script is what sends the results of the benchmarks to the pull request.
 
+Here is an example of a module with the necessary files and structure: [AMD.jl](https://github.com/JuliaSmoothOptimizers/AMD.jl).
+
 For all these scripts to work, you need to add some modules to `benchmark/Project.toml`.
 
-If you wish to these modules manually, execute the following in the julia REPL:
+If you wish to add these modules manually, execute the following in the julia REPL:
 
 ```
 using Pkg

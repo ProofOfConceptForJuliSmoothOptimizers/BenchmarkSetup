@@ -5,7 +5,7 @@ A webhook needs to be setup to communicate with the remote server that will run 
 
 Here are the following steps:
 
-1. In the `Jenkinsfile`, set the value of the `token` variable to *module_name* without the ".jl" (i.e `token: LDLFactorizations`).
+1. In the `Jenkinsfile`, set the value of the `token` variable to *module_name* without the ".jl" (e.g `token: LDLFactorizations`).
 
 2.  Go to **Settings** and in **Webhooks** of the repository. 
 	![](https://res.cloudinary.com/practicaldev/image/fetch/s--FG6s3z8s--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://thepracticaldev.s3.amazonaws.com/i/9g49g2mg4pbjrasyo7fz.png)
