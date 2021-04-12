@@ -1,12 +1,15 @@
-function create_pullrequests(api::GitHub.GitHubWebAPI, org::String, repositories::Vector{Repo}, new_branch_name::String, base_branch_name::String, message::String; kwargs...)
+function create_pullrequests(api::GitHub.GitHubWebAPI, org::String, repositories::Vector{Repo}, new_branch_name::String, base_branch_name::String, title::String, is_fork::Bool; kwargs...)
     
-    [create_pullrequest(api, org, repository, new_branch_name, base_branch_name, message; kwargs...) for repository in repositories]
+    [create_pullrequest(api, org, repository, new_branch_name, base_branch_name, title, is_fork; kwargs...) for repository in repositories]
 end
 
-function create_pullrequest(api::GitHub.GitHubWebAPI, org::String, repository::Repo, new_branch_name::String, base_branch_name::String, message::String; kwargs...)
-
-    myparams = Dict(:head => new_branch_name, :base => base_branch_name, :title => message)
-
+function create_pullrequest(api::GitHub.GitHubWebAPI, org::String, repository::Repo, new_branch_name::String, base_branch_name::String, title::String, is_fork::Bool; kwargs...)
+    myparams = Dict(:head => new_branch_name, :base => base_branch_name, :title => title)
+    if(is_fork)
+        println("$(repository.name)-$org:$base_branch_name")
+        myparams[:owner] = org
+        myparams[:repo] = repository.name
+    end
     # check if pr exists
     is_new_pr, pr_number = is_new_pullrequest(api, org, repository, new_branch_name, base_branch_name; kwargs...)
     if is_new_pr
