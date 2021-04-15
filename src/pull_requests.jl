@@ -1,18 +1,21 @@
-function create_pullrequests(api::GitHub.GitHubWebAPI, org::String, repositories::Vector{Repo}, new_branch_name::String, base_branch_name::String, message::String; kwargs...)
+function create_pullrequests(api::GitHub.GitHubWebAPI, org::String, repositories::Vector{Repo}, new_branch_name::String, base_branch_name::String, title::String; kwargs...)
     
-    [create_pullrequest(api, org, repository, new_branch_name, base_branch_name, message; kwargs...) for repository in repositories]
+    [create_pullrequest(api, org, repository, new_branch_name, base_branch_name, title; kwargs...) for repository in repositories]
 end
 
-function create_pullrequest(api::GitHub.GitHubWebAPI, org::String, repository::Repo, new_branch_name::String, base_branch_name::String, message::String; kwargs...)
+function create_pullrequest(api::GitHub.GitHubWebAPI, org::String, repository::Repo, new_branch_name::String, base_branch_name::String, title::String; kwargs...)
+    try
+        myparams = Dict(:head => new_branch_name, :base => base_branch_name, :title => title)
 
-    myparams = Dict(:head => new_branch_name, :base => base_branch_name, :title => message)
-
-    # check if pr exists
-    is_new_pr, pr_number = is_new_pullrequest(api, org, repository, new_branch_name, base_branch_name; kwargs...)
-    if is_new_pr
-        GitHub.create_pull_request(api, repository; params = myparams, kwargs...)
-    else
-        GitHub.update_pull_request(api, repository, pr_number; params = myparams, kwargs...)
+        # check if pr exists
+        is_new_pr, pr_number = is_new_pullrequest(api, org, repository, new_branch_name, base_branch_name; kwargs...)
+        if is_new_pr
+            GitHub.create_pull_request(api, repository; params = myparams, kwargs...)
+        else
+            GitHub.update_pull_request(api, repository, pr_number; params = myparams, kwargs...)
+        end
+    catch exception
+        println("Couldn't create PR: $exception")
     end
 end
 

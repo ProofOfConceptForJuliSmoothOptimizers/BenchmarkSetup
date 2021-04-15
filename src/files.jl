@@ -1,16 +1,20 @@
 
 function update_file(api::GitHub.GitHubWebAPI, path::String, repositories::Vector{Repo}, new_branch_name::String, message::String; kwargs...)
-    file = open(path, "r")
-    myparams = Dict(:branch => new_branch_name, :message => message,  :content => base64encode(file))
-    close(file)
-    for repo in repositories
-        sha_of_file = get_file_sha(api, path, repo, new_branch_name)
-        if length(sha_of_file) > 0
-           myparams[:sha] = sha_of_file
-        end 
-        GitHub.update_file(api, repo, path; params = myparams, kwargs...)
-        println("file at $(path) updated in $(repo.name)")
-        delete!(myparams, :sha)
+    try
+        file = open(path, "r")
+        myparams = Dict(:branch => new_branch_name, :message => message,  :content => base64encode(file))
+        close(file)
+        for repo in repositories
+            sha_of_file = get_file_sha(api, path, repo, new_branch_name)
+            if length(sha_of_file) > 0
+            myparams[:sha] = sha_of_file
+            end 
+            GitHub.update_file(api, repo, path; params = myparams, kwargs...)
+            println("file at $(path) updated in $(repo.name)")
+            delete!(myparams, :sha)
+        end
+    catch exception
+        println("Couldn't update file in $(repo.name)")
     end
 end
 
