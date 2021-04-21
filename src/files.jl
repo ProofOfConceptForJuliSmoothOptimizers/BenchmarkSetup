@@ -14,7 +14,7 @@ function update_file(api::GitHub.GitHubWebAPI, path::String, repositories::Vecto
             delete!(myparams, :sha)
         end
     catch exception
-        println("Couldn't update file in $(repo.name)")
+        println("Couldn't update file!")
     end
 end
 
