@@ -1,6 +1,8 @@
 #!/bin/bash
 
-julia benchmark/send_comment_to_pr.jl -o $org -r $repo -p $pullrequest -c '**Starting benchmarks!**'  
+julia benchmark/send_comment_to_pr.jl -o $org -r $repo -p $pullrequest -c '**Starting benchmarks!**'
+
+git checkout $BRANCH_NAME --
 
 julia benchmark/$1 $2
 
