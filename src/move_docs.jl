@@ -15,11 +15,32 @@ org = "JuliaSmoothOptimizers"
 # org = "ProofOfConceptForJuliSmoothOptimizers"
 myauth = GitHub.authenticate(ENV["JSO_GITHUB_AUTH"])
 
+file_body = 
+"""
+# Reference
+​
+## Contents
+​
+```@contents
+Pages = ["reference.md"]
+```
+​
+## Index
+​
+```@index
+Pages = ["reference.md"]
+```
+​
+```@autodocs
+"""
+end_of_file = "```"
+
 repositories = GitHub.repos(api, org; auth = myauth)[1]
 
 function update_docs(api, org, repositories; kwargs...)
     for repo in repositories
-        has_change = false
+        has_docs = false
+        repo_ref = "Modules = [$(split(repo.name, '.')[1])]\n"
         clone_repo(repo)
         cd(repo.name) do
             git() do git
@@ -31,31 +52,24 @@ function update_docs(api, org, repositories; kwargs...)
 
             end
             if("docs" in readdir())
-                cd("docs") do 
-                    if("index.md" in readdir())
-                        run(`mv index.md src/`)
-                        has_change = true
-                        println("index.md moved to src folder")
-                    end
-                    if("tutorial.md" in readdir())
-                        run(`mv tutorial.md src/`)
-                        has_change = true
-                        println("tutorial.md moved to src folder")
-                    end
+                has_docs = true 
+                cd(joinpath("docs", "src")) do
                     if("reference.md" in readdir())
-                        run(`mv reference.md src/`)
-                        has_change = true
-                        println("reference.md moved to src folder")
+                        open("reference.md", "w") do file
+                            write(file, file_body)
+                            write(file, repo_ref)
+                            write(file, end_of_file)
+                        end
                     end
                 end
             else
                 println("docs folder not found in $(repo.name)")
             end
             git() do git
-                if(has_change)
+                if(has_docs)
                     run(`$git add docs`)
-                    run(`$git commit -m "fix docs folder structure"`)
                     try
+                        run(`$git commit -m "fix reference.md"`)
                         run(`$git push origin workflows`)
                     catch
                         run(`$git push -u origin workflows`)
@@ -67,5 +81,5 @@ function update_docs(api, org, repositories; kwargs...)
         rm(joinpath(@__DIR__, "..", repo.name); force = true, recursive = true)
     end
 end
-filter!(repo -> (match(r"^AMD.jl$", repo.name) != nothing), repositories)
+# filter!(repo -> (match(r"^AMD.jl$", repo.name) != nothing), repositories)
 update_docs(api, org, repositories; auth=myauth)
