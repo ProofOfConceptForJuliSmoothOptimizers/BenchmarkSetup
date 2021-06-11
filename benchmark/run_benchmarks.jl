@@ -11,7 +11,6 @@ using Git
 # we want to develop the package instead of using the release
 if isdir(joinpath(bmark_dir, "..", ".git"))
   Pkg.develop(PackageSpec(url=joinpath(bmark_dir, "..")))
-  bmarkname = Git.head()  # sha of HEAD
 end
 
 using DataFrames
