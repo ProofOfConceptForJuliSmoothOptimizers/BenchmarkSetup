@@ -5,7 +5,6 @@ Pkg.activate(bmark_dir)
 Pkg.instantiate()
 repo_name = string(split(ARGS[1], ".")[1])
 bmarkname = lowercase(repo_name)
-using Git
 
 # if we are running these benchmarks from the git repository
 # we want to develop the package instead of using the release
