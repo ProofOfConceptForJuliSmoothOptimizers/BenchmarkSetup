@@ -4,17 +4,13 @@ julia benchmark/send_comment_to_pr.jl -o $org -r $repo -p $pullrequest -c '**Sta
 
 git checkout $BRANCH_NAME --
 
-echo " PR number: $pullrequest"
-
 if [ "$?" -ne 0 ] ; then
     LOCAL_BRANCH_NAME="temp_bmark"
     git fetch origin pull/$pullrequest/head:$LOCAL_BRANCH_NAME
     git checkout $LOCAL_BRANCH_NAME --
 fi
 
-
-julia benchmark/$1 $2
-
+julia benchmark/$1 $repo
 
 if [ "$?" -eq "0" ] ; then
     julia benchmark/send_comment_to_pr.jl -o $org -r $repo -p $pullrequest -g
