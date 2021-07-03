@@ -78,7 +78,7 @@ pipeline {
           git pull origin master
           git fetch origin
           git branch -D $BRANCH_NAME || true
-          git checkout -b $BRANCH_NAME origin/$BRANCH_NAME
+          git checkout -b $BRANCH_NAME origin/$BRANCH_NAME || true
           '''
         }
       }
