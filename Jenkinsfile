@@ -29,7 +29,7 @@ pipeline {
             value: '$.organization.login',
             expressionType: 'JSONPath', //Optional, defaults to JSONPath
             regexpFilter: '', //Optional, defaults to empty string
-            defaultValue: 'ProofOfConceptForJuliSmoothOptimizers' //Optional, defaults to empty string
+            defaultValue: 'JuliaSmoothOptimizers' //Optional, defaults to empty string
         ],
         [
             key: 'pullrequest',
