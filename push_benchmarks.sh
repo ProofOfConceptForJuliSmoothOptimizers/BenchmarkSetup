@@ -4,7 +4,7 @@ julia benchmark/send_comment_to_pr.jl -o $org -r $repo -p $pullrequest -c '**Sta
 
 git checkout $BRANCH_NAME --
 
-if [ "$?" -ne 0 ] ; then
+if [ "$?" -ne "0" ] ; then
     LOCAL_BRANCH_NAME="temp_bmark"
     git fetch origin pull/$pullrequest/head:$LOCAL_BRANCH_NAME
     git checkout $LOCAL_BRANCH_NAME --
@@ -17,5 +17,7 @@ if [ "$?" -eq "0" ] ; then
 else
     julia benchmark/send_comment_to_pr.jl -o $org -r $repo -p $pullrequest -c "**An error has occured while running the benchmark script: $1** "
 fi
+
+git checkout master
 
 git branch -D $LOCAL_BRANCH_NAME
