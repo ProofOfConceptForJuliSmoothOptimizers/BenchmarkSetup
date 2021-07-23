@@ -1,8 +1,7 @@
 #!/bin/bash
 
-julia -E 'using Pkg; Pkg.activate(joinpath("temp_env", "NLPModelsKnitro")); Pkg.develop(PackageSpec(url=joinpath("."))); Pkg.build("NLPModelsKnitro"); Pkg.test("NLPModelsKnitro")' &> test_results.txt
+# Specify the module to test (e.g "HSL")
+julia -E 'using Pkg; module_name = ""; Pkg.activate("test_env"); Pkg.develop(PackageSpec(url=joinpath("."))); Pkg.build(module_name); Pkg.test(module_name)' &> "$org"_"$repo"_"$pullrequest".txt
 
 # Create the gist and create comment on PR:
 julia test/send_gist_url.jl
-
-
