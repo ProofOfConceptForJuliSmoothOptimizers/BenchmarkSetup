@@ -41,8 +41,8 @@ for repo in repositories
             catch
                 run(`$git push -u origin workflows`)
             end
-            create_pullrequest(api, org, repo, "workflows", "master", "Update CI, TagBot and documentation workflows"; auth=myauth)
-            # create_pullrequest(api, org, repo, "workflows", "master", "This is a test PR for workflows"; auth=myauth)
+            create_pullrequest(api, org, repo, "workflows", "main", "Update CI, TagBot and documentation workflows"; auth=myauth)
+            # create_pullrequest(api, org, repo, "workflows", "main", "This is a test PR for workflows"; auth=myauth)
         end
     end
     rm(joinpath(@__DIR__, "..", repo.name); force = true, recursive = true)

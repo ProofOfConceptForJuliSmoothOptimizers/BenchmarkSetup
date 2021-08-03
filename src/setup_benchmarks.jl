@@ -34,8 +34,8 @@ function parse_commandline()
             arg_type = String   
             required = true
         "--base_branch", "-B"
-            help = "The name of an existing branch. 'master' is the default value."
-            default = "master"
+            help = "The name of an existing branch. 'main' is the default value."
+            default = "main"
         "--title", "-t"
             help = "pull request title"
             arg_type = String

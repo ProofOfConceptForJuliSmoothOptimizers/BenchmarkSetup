@@ -5,9 +5,9 @@ JSOBot is the new member of the organization that will be able to benchmark any 
 
 ## What does it do?
 
-JSOBot's most basic function is to benchmark a repository by comparing a branch to the master. This way, the developers can easily check if the new changes made are having an impact on the performance of the given module.
+JSOBot's most basic function is to benchmark a repository by comparing a branch to the main. This way, the developers can easily check if the new changes made are having an impact on the performance of the given module.
 
-**The bot will always compare the latest commit of the current branch with the lastest version of the master branch.**
+**The bot will always compare the latest commit of the current branch with the lastest version of the main branch.**
 
 <p align="center">
 	<img src="images/image1.png"/>
@@ -32,7 +32,7 @@ If you want to setup the webhooks manually, simply omit the `--webhook` argument
 
 First, make sure you have a pull request containing all your commits. 
 
-Make sure you have all the necessary files on your branch and on the master branch and that the webhook is correctly configured. [See here](webhook_setup.md).  
+Make sure you have all the necessary files on your branch and on the main branch and that the webhook is correctly configured. [See here](webhook_setup.md).  
 
 **Verify that the `token` variable in the Jenkinsfile has the same value as the token in the payload url of the webhook.**
 
@@ -68,8 +68,8 @@ All the necessary files can be found [here](https://github.com/ProofOfConceptFor
  
 Here are the files required **at the base of your repository AND at the branch you want to benchmark**:
 
-1. A `Jenkinsfile` needs to be in the master branch.
-2. A `Jenkinsfile` needs to be in the branch you want to benchmark (different than master).
+1. A `Jenkinsfile` needs to be in the main branch.
+2. A `Jenkinsfile` needs to be in the branch you want to benchmark (different than main).
 3. A bash script called `push_benchmarks.sh`.
 
 It is necessary for a module to have a `benchmark` folder. That folder needs to contain some specific files: 

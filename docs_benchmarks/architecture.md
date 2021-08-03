@@ -11,7 +11,7 @@ After a the job is completed, a julia script script is executed by the computing
 
 ## Issues
 
-As of now, although it is possible to compare a branch with the master branch for a given repository, there is an issue with the approach taken.
+As of now, although it is possible to compare a branch with the main branch for a given repository, there is an issue with the approach taken.
 
 ### Multiple Job Triggered
 

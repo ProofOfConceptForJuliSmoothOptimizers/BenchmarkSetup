@@ -40,7 +40,7 @@ All that's left is to configure a pipeline of type `github organization folder`.
 
 ## The Jenkinsfile
 
-This file almost all of the logic and all the important configurations. It allows to write your pipeline as code and to have the bulk of your configurations in a single file. This `Jenkinsfile` must abolutely be in each branch that you want to pipeline. Jenkins will not detect your repository if the `Jenkinsfile` is not in the master branch.
+This file almost all of the logic and all the important configurations. It allows to write your pipeline as code and to have the bulk of your configurations in a single file. This `Jenkinsfile` must abolutely be in each branch that you want to pipeline. Jenkins will not detect your repository if the `Jenkinsfile` is not in the main branch.
 
 This `Jenkinsfile` was written by following the [standard declarative pipeline documentation](https://www.jenkins.io/doc/book/pipeline/syntax/). The configuration of the Generic Webhook Trigger Plugin in the `Jenkinsfile` was heavily inspired by the [plugin documentation](https://github.com/jenkinsci/generic-webhook-trigger-plugin).
 

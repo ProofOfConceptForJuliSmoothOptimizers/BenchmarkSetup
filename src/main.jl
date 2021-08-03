@@ -38,8 +38,8 @@ function parse_commandline()
             arg_type = String   
             required = true
         "--base_branch", "-B"
-            help = "The name of an existing branch. 'master' is the default value."
-            default = "master"
+            help = "The name of an existing branch. 'main' is the default value."
+            default = "main"
         "--file", "-f"
             help = "path to file to update (e.g dir1/dir2/file_to_update.txt and not ./dir1/dir2/file_to_update.txt). 
                     Make sure to use the '/' delimiter for the path."

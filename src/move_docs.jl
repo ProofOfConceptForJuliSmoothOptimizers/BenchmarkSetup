@@ -74,7 +74,7 @@ function update_docs(api, org, repositories; kwargs...)
                     catch
                         run(`$git push -u origin workflows`)
                     end
-                    create_pullrequest(api, org, repo, "workflows", "master", "Update CI, TagBot and documentation workflows"; kwargs...)
+                    create_pullrequest(api, org, repo, "workflows", "main", "Update CI, TagBot and documentation workflows"; kwargs...)
                 end
             end
         end
