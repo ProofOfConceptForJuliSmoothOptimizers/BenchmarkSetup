@@ -5,8 +5,8 @@ function setup_benchmarks(api::GitHub.GitHubWebAPI, org::String, repositories::V
     file_paths = [normpath("push_benchmarks.sh"), normpath("benchmark", "run_benchmarks.jl"),
     normpath("benchmark", "send_comment_to_pr.jl"), normpath("Jenkinsfile")]
     for repository in repositories
-        clone_repo(repository)
         create_branch(api, org, repository, new_branch_name, base_branch_name; kwargs...)
+        clone_repo(repository)
         println(pwd())
         populate_environment(repository, new_branch_name)
         println(pwd())
