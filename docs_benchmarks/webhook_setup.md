@@ -15,6 +15,8 @@ Here are the following steps:
 	![](https://res.cloudinary.com/practicaldev/image/fetch/s--uBEnAyMb--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://thepracticaldev.s3.amazonaws.com/i/kwfykcgytaqvzxaz8gks.png)
 * In  **payload URL** , add the following address: http://frontal22.recherche.polymtl.ca:8080/generic-webhook-trigger/invoke?token=module_name.  
 	* replace `module_name` with the value of the `token` variable found in the `Jenkinsfile`. **The token in the `Jenkinsfile` must be the same as the one in the url.**
+	
+	* Make sure to not include a ".jl" in the payload (e.g use `HSL` instead of `HSL.jl`)
 
 * In the **Content Type** , choose the **application/json** option.
 
