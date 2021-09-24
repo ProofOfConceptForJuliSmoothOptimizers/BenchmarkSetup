@@ -43,14 +43,12 @@ function update_docs(api, org, repositories; kwargs...)
         repo_ref = "Modules = [$(split(repo.name, '.')[1])]\n"
         clone_repo(repo)
         cd(repo.name) do
-            git() do git
-                try
-                    run(`$git checkout workflows --`)
-                catch
-                    run(`$git checkout -b workflows --`)
-                end
-
+            try
+                run(`$(git()) checkout workflows --`)
+            catch
+                run(`$(git()) checkout -b workflows --`)
             end
+
             if("docs" in readdir())
                 has_docs = true 
                 cd(joinpath("docs", "src")) do
@@ -65,17 +63,15 @@ function update_docs(api, org, repositories; kwargs...)
             else
                 println("docs folder not found in $(repo.name)")
             end
-            git() do git
-                if(has_docs)
-                    run(`$git add docs`)
-                    try
-                        run(`$git commit -m "fix reference.md"`)
-                        run(`$git push origin workflows`)
-                    catch
-                        run(`$git push -u origin workflows`)
-                    end
-                    create_pullrequest(api, org, repo, "workflows", "main", "Update CI, TagBot and documentation workflows"; kwargs...)
+            if(has_docs)
+                run(`$(git()) add docs`)
+                try
+                    run(`$(git()) commit -m "fix reference.md"`)
+                    run(`$(git()) push origin workflows`)
+                catch
+                    run(`$(git()) push -u origin workflows`)
                 end
+                create_pullrequest(api, org, repo, "workflows", "main", "Update CI, TagBot and documentation workflows"; kwargs...)
             end
         end
         rm(joinpath(@__DIR__, "..", repo.name); force = true, recursive = true)

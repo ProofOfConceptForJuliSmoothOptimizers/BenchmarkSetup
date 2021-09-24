@@ -22,9 +22,7 @@ end
 function clone_repo(repository::Repo)
     clone_url = get_clone_url(repository)
     try
-        git() do git
-            run(`$git clone $(repository.clone_url)`)
-        end
+        run(`$(git()) clone $(repository.clone_url)`)
     catch exception
         println("The repository already exists locally!")
         println(exception)
@@ -33,10 +31,9 @@ end
 
 function populate_environment(repository::Repo, new_branch_name::String)
     cd(joinpath(repository.name))
-    git() do git
-        run(`$git pull origin`)
-        run(`$git checkout $new_branch_name --`)
-    end
+    run(`$(git()) pull origin`)
+    run(`$(git()) checkout $new_branch_name --`)
+
     Pkg.activate(joinpath("benchmark"))
     Pkg.add(bmark_dependencies)
     [println(dependency, " added ✔") for dependency in bmark_dependencies]
@@ -44,12 +41,10 @@ function populate_environment(repository::Repo, new_branch_name::String)
     Pkg.resolve()
     Pkg.instantiate()
     try
-        git() do git
-            run(`$git add benchmark/Project.toml`)
-            run(`$git commit -m "setting up project.toml for benchmarks"`)
-            run(`$git pull`)
-            run(` $git push`)
-        end
+        run(`$(git()) add benchmark/Project.toml`)
+        run(`$(git()) commit -m "setting up project.toml for benchmarks"`)
+        run(`$(git()) pull`)
+        run(` $(git()) push`)
     catch exception
         println("Working tree clean, nothing to commit!")
     end

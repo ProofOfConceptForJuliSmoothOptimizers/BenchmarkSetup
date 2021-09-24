@@ -8,7 +8,7 @@ using Git
 using GitHub
 using JSON
 using Base64
-using GitCommand
+# using GitCommand
 
 include(joinpath(@__DIR__,"files.jl"))
 include(joinpath(@__DIR__,"branches.jl"))
@@ -52,7 +52,6 @@ function main()
 
     api = GitHub.DEFAULT_API
     # Need to add GITHUB_AUTH to your .bashrc
-    # myauth = GitHub.authenticate("99c2656683ba93a4f3cb2f01494bcd1bcc416545")
     myauth = GitHub.authenticate(ENV["JSO_GITHUB_AUTH"])
     # parse the arguments:
 
