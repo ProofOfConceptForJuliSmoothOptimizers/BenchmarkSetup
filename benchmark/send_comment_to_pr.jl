@@ -51,9 +51,10 @@ end
 function create_gist_from_log_file(gist_file, pullrequest_id, myauth)
   file_content = ""
   file = open(gist_file, "r")
-  # this end -300 is just to take the last 300 lines as the file is quite huge
+
   file_lines = readlines(file)
-  lines = length(file_lines) >= 300 ? file_lines[end-299:end] : file_lines
+  line_number = findfirst(x -> !isnothing(match(r"ERROR:", x)), file_lines)
+  lines = !isnothing(line_number) ? file_lines[line_number:end] : [""]
   for line in lines
       file_content *= line*'\n'
   end
