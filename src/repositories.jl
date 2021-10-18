@@ -59,7 +59,6 @@ function setup_benchmarks(
 end
 
 function clone_repo(repository::Repo)
-    clone_url = get_clone_url(repository)
     try
         run(`$(git()) clone $(repository.clone_url)`)
     catch exception
@@ -80,10 +79,11 @@ function populate_environment(repository::Repo, new_branch_name::String)
     Pkg.resolve()
     Pkg.instantiate()
     try
+        clone_url = get_clone_url(repository)
         run(`$(git()) add benchmark/Project.toml`)
         run(`$(git()) commit -m "setting up project.toml for benchmarks"`)
         run(`$(git()) pull`)
-        run(` $(git()) push`)
+        run(` $(git()) push $(clone_url)`)
     catch exception
         println("Working tree clean, nothing to commit!")
     end
