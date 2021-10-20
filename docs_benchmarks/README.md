@@ -16,15 +16,17 @@ JSOBot's most basic function is to benchmark a repository by comparing a branch 
 
 To set up JSOBot on your julia module, simply clone this [repository](https://github.com/ProofOfConceptForJuliSmoothOptimizers/BenchmarkSetup).
 
+
 Simply run: 
 
 ```
 cd ~/BenchmarkSetup
-julia src/setup_benchmarks.jl --org ${your_organization} --repo ${your_repo} --new_branch ${branch_name} --title {pr_title} --webhook
+julia src/setup_benchmarks.jl --org ${your_organization} --repo ${your_repo} --new_branch ${branch_name} --title {pr_title}
 ```
 
+To setup the **repository** webhooks, follow [this guide](webhook_setup.md).
 
-If you want to setup the webhooks manually, simply omit the `--webhook` argument and follow [this guide](webhook_setup.md).
+If you wish to setup the benchmarks for a GitHub organization or for multiple repositories belonging to the same owner, follow [this guide](org_webhook_setup.md).
 
 `setup_benchmarks.jl` adds all the necessary dependencies to the `Project.toml`.
 
