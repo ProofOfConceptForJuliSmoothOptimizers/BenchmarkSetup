@@ -29,6 +29,7 @@ To setup the **repository** webhooks, follow [this guide](webhook_setup.md).
 If you wish to setup the benchmarks for a GitHub organization or for multiple repositories belonging to the same owner, follow [this guide](org_webhook_setup.md).
 
 `setup_benchmarks.jl` adds all the necessary dependencies to the `Project.toml`.
+**Note:** Make sure the field `token:` in your Jenkinsfile contains the name your repository without the `.jl` at the end.
 
 ## How do I run my benchmarks?
 
