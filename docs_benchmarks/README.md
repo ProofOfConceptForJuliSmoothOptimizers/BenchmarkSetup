@@ -29,7 +29,14 @@ To setup the **repository** webhooks, follow [this guide](webhook_setup.md).
 If you wish to setup the benchmarks for a GitHub organization or for multiple repositories belonging to the same owner, follow [this guide](org_webhook_setup.md).
 
 `setup_benchmarks.jl` adds all the necessary dependencies to the `Project.toml`.
-**Note:** Make sure the field `token:` in your Jenkinsfile contains the name your repository without the `.jl` at the end.
+
+### Jenkinsfile
+The `Jenkinsfile` is the file that describes the CI/CD pipeline of a specific branch. For a build to be triggered, you must:
+
+- Make sure the field `token:` in your Jenkinsfile contains the name of your repository without the `.jl` at the end.
+
+That way, Jenkins knows which pipeline to run.  
+
 
 ## How do I run my benchmarks?
 
