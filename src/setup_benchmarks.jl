@@ -40,9 +40,6 @@ function parse_commandline()
         help = "pull request title"
         arg_type = String
         default = "Setting up benchmarks"
-        "--webhook", "-w"
-        help = "boolean that triggers the setup of webhooks for the benchmarks."
-        action = :store_true
     end
 
     return parse_args(s, as_symbols = true)
@@ -61,8 +58,6 @@ function main()
     new_branch_name = parsed_args[:new_branch]
     base_branch_name = parsed_args[:base_branch]
     title = parsed_args[:title]
-    is_webhook = parsed_args[:webhook]
-
     # getting the right repositories given as argument: 
 
     repositories =
@@ -81,14 +76,6 @@ function main()
         title;
         auth = myauth,
     )
-    # create webhooks for benchmarks
-    if is_webhook
-        [
-            create_benchmark_webhook(api, org, repository; auth = myauth) for
-            repository in repositories
-        ]
-        println("Webhook setup done ✔")
-    end
     println("setting benchmarks done!")
 end
 
