@@ -60,8 +60,8 @@ pipeline {
   stages {
     stage('run tests') {
       steps {
-        sh "chmod +x run_tests.sh"
-        sh "./run_tests.sh"
+        sh "chmod +x test/run_tests.sh"
+        sh "./test/run_tests.sh"
       }
     }
   }
