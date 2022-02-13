@@ -10,7 +10,7 @@ git branch -D $LOCAL_BRANCH_NAME || true
 git fetch origin pull/$pullrequest/head:$LOCAL_BRANCH_NAME
 git checkout $LOCAL_BRANCH_NAME -- || true
 
-julia --project=benchmark -E 'using Pkg; Pkg.resolve()'
+julia --project=benchmark -E 'using Pkg; Pkg.resolve(); Pkg.instantiate()'
 julia --project=benchmark ../BenchmarkSetup/benchmark/send_comment_to_pr.jl -o $org -r $repo -p $pullrequest -c '**Starting benchmarks!**'
 
 LOCAL_BRANCH_NAME="temp_bmark"
