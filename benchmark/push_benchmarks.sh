@@ -2,9 +2,9 @@
 
 set +x
 git clean -fd
-git checkout main
-git pull origin main
 git fetch origin
+git checkout complex
+git pull origin complex
 LOCAL_BRANCH_NAME="temp_bmark"
 git branch -D $LOCAL_BRANCH_NAME || true
 git fetch origin pull/$pullrequest/head:$LOCAL_BRANCH_NAME

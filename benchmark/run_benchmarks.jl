@@ -20,7 +20,7 @@ using SolverBenchmark
 
 # NB: benchmarkpkg will run benchmarks/benchmarks.jl by default
 commit = benchmarkpkg(repo_name;script=bmarkscript)  # current state of repository
-main = benchmarkpkg(repo_name, "main";script=bmarkscript)
+main = benchmarkpkg(repo_name, "complex";script=bmarkscript)
 judgement = judge(commit, main)
 
 commit_stats = bmark_results_to_dataframes(commit)
