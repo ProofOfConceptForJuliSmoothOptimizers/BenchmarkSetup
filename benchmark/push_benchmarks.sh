@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set +x
 git clean -fd
 git checkout main
 git pull origin main
@@ -21,6 +22,7 @@ exit_status="$?"
 if [ "$?" -eq "0" ] ; then
     julia --project=benchmark ../BenchmarkSetup/benchmark/send_comment_to_pr.jl -o $org -r $repo -p $pullrequest -c "Benchmark results" -g "gist.json"
 else
+    echo "I failed horribly"
     ERROR_LOGS="/home/jenkins/benchmarks/$org/$repo/${pullrequest}_${BUILD_NUMBER}_bmark_error.log"
     julia --project=benchmark ../BenchmarkSetup/benchmark/send_comment_to_pr.jl -o $org -r $repo -p $pullrequest -c "**An error occured while running $1**" -g $ERROR_LOGS
 fi
