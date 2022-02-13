@@ -20,16 +20,12 @@ julia --project=benchmark ../BenchmarkSetup/benchmark/run_benchmarks.jl $repo $1
 exit_status="$?"
 
 if [ $exit_status -eq "0" ] ; then
-    echo "I was supposed to fail, but here I am..."
     julia --project=benchmark ../BenchmarkSetup/benchmark/send_comment_to_pr.jl -o $org -r $repo -p $pullrequest -c "Benchmark results" -g "gist.json"
 else
-    echo "I failed horribly"
     ERROR_LOGS="/home/jenkins/benchmarks/$org/$repo/${pullrequest}_${BUILD_NUMBER}_bmark_error.log"
     julia --project=benchmark ../BenchmarkSetup/benchmark/send_comment_to_pr.jl -o $org -r $repo -p $pullrequest -c "**An error occured while running $1**" -g $ERROR_LOGS
 fi
 
-echo "--------------------"
-echo "$exit_status"
 rm -rf ../BenchmarkSetup*
 git clean -fd
 git reset --hard

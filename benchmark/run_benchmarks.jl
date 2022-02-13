@@ -6,7 +6,6 @@ bmarkscript = joinpath(".", "benchmark", ARGS[2])
 # if we are running these benchmarks from the git repository
 # we want to develop the package instead of using the release
 if isdir(joinpath("."))
-    @info "I am developing myself"
     Pkg.develop(PackageSpec(url = joinpath(".")))
 end
 
