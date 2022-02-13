@@ -19,7 +19,7 @@ git checkout $LOCAL_BRANCH_NAME -- || true
 julia --project=benchmark ../BenchmarkSetup/benchmark/run_benchmarks.jl $repo $1
 exit_status="$?"
 
-if [ "$?" -eq "0" ] ; then
+if [ $exit_status -eq "0" ] ; then
     echo "I was supposed to fail, but here I am..."
     julia --project=benchmark ../BenchmarkSetup/benchmark/send_comment_to_pr.jl -o $org -r $repo -p $pullrequest -c "Benchmark results" -g "gist.json"
 else
