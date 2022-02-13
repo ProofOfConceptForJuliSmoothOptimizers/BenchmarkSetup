@@ -26,7 +26,7 @@ else
 fi
 
 echo "--------------------"
-echo "exit_status"
+echo "$exit_status"
 rm -rf ../BenchmarkSetup*
 git clean -fd
 git reset --hard
