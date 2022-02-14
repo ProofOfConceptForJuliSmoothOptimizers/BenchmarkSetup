@@ -2,7 +2,7 @@ using Pkg
 repo_name = string(split(ARGS[1], ".")[1])
 bmarkname = lowercase(repo_name)
 bmarkscript = joinpath(".", "benchmark", ARGS[2])
-bmark_base_branch = ARGS[3]
+bmark_base_branch = split(ARGS[3], '"')[2]
 # if we are running these benchmarks from the git repository
 # we want to develop the package instead of using the release
 if isdir(joinpath("."))
