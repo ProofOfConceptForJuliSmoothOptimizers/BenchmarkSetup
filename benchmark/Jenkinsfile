@@ -116,7 +116,10 @@ pipeline {
         }
         dir(WORKSPACE + "/$repo") {
         sh "mkdir -p $HOME/benchmarks/${org}/${repo}"
-        sh "qsub -N ${repo}_${pullrequest} -V -cwd -o $HOME/benchmarks/${org}/${repo}/${pullrequest}_${BUILD_NUMBER}_bmark_output.log -e $HOME/benchmarks/${org}/${repo}/${pullrequest}_${BUILD_NUMBER}_bmark_error.log ../BenchmarkSetup/benchmark/push_benchmarks.sh $bmarkFile"
+        sh """
+          base_branch=$(cat response.json | python3 -c 'import json, sys; print(json.load(sys.stdin)["base"]["ref"])')
+          qsub -N ${repo}_${pullrequest} -V -cwd -o $HOME/benchmarks/${org}/${repo}/${pullrequest}_${BUILD_NUMBER}_bmark_output.log -e $HOME/benchmarks/${org}/${repo}/${pullrequest}_${BUILD_NUMBER}_bmark_error.log ../BenchmarkSetup/benchmark/push_benchmarks.sh $bmarkFile $base_branch"
+        """
         }   
       }
     }

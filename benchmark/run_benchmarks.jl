@@ -2,7 +2,7 @@ using Pkg
 repo_name = string(split(ARGS[1], ".")[1])
 bmarkname = lowercase(repo_name)
 bmarkscript = joinpath(".", "benchmark", ARGS[2])
-
+bmark_base_branch = ARGS[3]
 # if we are running these benchmarks from the git repository
 # we want to develop the package instead of using the release
 if isdir(joinpath("."))
@@ -19,8 +19,9 @@ using Plots
 using SolverBenchmark
 
 # NB: benchmarkpkg will run benchmarks/benchmarks.jl by default
+@info "base branch: $bmark_base_branch"
 commit = benchmarkpkg(repo_name;script=bmarkscript)  # current state of repository
-main = benchmarkpkg(repo_name, "main";script=bmarkscript)
+main = benchmarkpkg(repo_name, bmark_base_branch;script=bmarkscript)
 judgement = judge(commit, main)
 
 commit_stats = bmark_results_to_dataframes(commit)

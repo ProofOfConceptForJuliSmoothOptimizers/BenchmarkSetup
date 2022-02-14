@@ -16,7 +16,7 @@ julia --project=benchmark ../BenchmarkSetup/benchmark/send_comment_to_pr.jl -o $
 LOCAL_BRANCH_NAME="temp_bmark"
 git checkout $LOCAL_BRANCH_NAME -- || true
 
-julia --project=benchmark ../BenchmarkSetup/benchmark/run_benchmarks.jl $repo $1
+julia --project=benchmark ../BenchmarkSetup/benchmark/run_benchmarks.jl $repo $1 $2
 exit_status="$?"
 
 if [ $exit_status -eq "0" ] ; then
