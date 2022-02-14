@@ -16,6 +16,7 @@ julia --project=benchmark ../BenchmarkSetup/benchmark/send_comment_to_pr.jl -o $
 url="https://api.github.com/repos/${org}/${repo}/pulls/${pullrequest}"
 curl -H 'Accept: application/vnd.github.v3+json' ${url} > response.json
 base_branch=$(julia --project -E 'using Pkg; Pkg.add("JSON"); using JSON; return JSON.parsefile("response.json")["base"]["ref"]')
+git restore Project.toml || true
 
 julia --project=benchmark ../BenchmarkSetup/benchmark/run_benchmarks.jl $repo $1 ${base_branch}
 exit_status="$?"
