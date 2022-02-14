@@ -13,7 +13,7 @@ git checkout $LOCAL_BRANCH_NAME -- || true
 julia --project=benchmark -E 'using Pkg; Pkg.resolve(); Pkg.instantiate()'
 julia --project=benchmark ../BenchmarkSetup/benchmark/send_comment_to_pr.jl -o $org -r $repo -p $pullrequest -c '**Starting benchmarks!**'
 
-julia --project=benchmark ../BenchmarkSetup/benchmark/run_benchmarks.jl $repo $1 $2
+julia --project=benchmark ../BenchmarkSetup/benchmark/run_benchmarks.jl $repo $1 ${BASE_BRANCH}
 exit_status="$?"
 
 if [ $exit_status -eq "0" ] ; then
