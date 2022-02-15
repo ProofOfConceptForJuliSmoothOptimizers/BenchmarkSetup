@@ -19,7 +19,7 @@ base_branch=$(julia --project -E 'using Pkg; Pkg.add("JSON"); using JSON; return
 git restore Project.toml || true
 echo "------Before tr:"
 echo $base_branch
-base_branch=$(echo $base_branch | tr -d '"')
+base_branch=$(echo $base_branch | tr -d '"' | tr -d "'")
 echo "------After tr:"
 echo $base_branch
 
