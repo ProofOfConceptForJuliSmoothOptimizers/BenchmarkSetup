@@ -2,9 +2,9 @@
 
 set +x
 git clean -fd
-git checkout main
-git pull origin main
 git fetch origin
+git checkout ${CHANGE_TARGET}
+git pull origin ${CHANGE_TARGET}
 LOCAL_BRANCH_NAME="temp_bmark"
 git branch -D $LOCAL_BRANCH_NAME || true
 git fetch origin pull/$pullrequest/head:$LOCAL_BRANCH_NAME
@@ -13,19 +13,7 @@ git checkout $LOCAL_BRANCH_NAME -- || true
 julia --project=benchmark -E 'using Pkg; Pkg.resolve(); Pkg.instantiate()'
 julia --project=benchmark ../BenchmarkSetup/benchmark/send_comment_to_pr.jl -o $org -r $repo -p $pullrequest -c '**Starting benchmarks!**'
 
-url="https://api.github.com/repos/${org}/${repo}/pulls/${pullrequest}"
-curl -H 'Accept: application/vnd.github.v3+json' ${url} > response.json
-base_branch=$(julia --project -E 'using Pkg; Pkg.add("JSON"); using JSON; return JSON.parsefile("response.json")["base"]["ref"]')
-git restore Project.toml || true
-echo "------Before tr:"
-echo $base_branch
-base_branch=$(echo $base_branch | tr -d '"' | tr -d "'")
-echo "------After tr:"
-echo $base_branch
-echo "------ CHANGE_TARGET for base branch:"
-echo $CHANGE_TARGET
-
-julia --project=benchmark ../BenchmarkSetup/benchmark/run_benchmarks.jl $repo $1 ${base_branch}
+julia --project=benchmark ../BenchmarkSetup/benchmark/run_benchmarks.jl $repo $1 ${$CHANGE_TARGET}
 exit_status="$?"
 
 if [ $exit_status -eq "0" ] ; then
