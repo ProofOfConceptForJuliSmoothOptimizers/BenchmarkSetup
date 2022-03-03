@@ -13,12 +13,7 @@ myauth = GitHub.authenticate(ENV["GITHUB_AUTH"])
 
 function create_gist(authentication)
 
-    file_content = ""
-    file = open(TEST_RESULTS_FILE, "r")
-    for line in readlines(file)
-        file_content *= line * '\n'
-    end
-    close(file)
+    file_content = read(TEST_RESULTS_FILE, String)
 
     file_dict = Dict(TEST_RESULTS_FILE => Dict("content" => file_content))
     gist = Dict{String,Any}(
