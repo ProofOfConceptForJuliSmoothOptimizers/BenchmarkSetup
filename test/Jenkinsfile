@@ -1,6 +1,5 @@
 def prNumber = BRANCH_NAME.tokenize("PR-")[0]
 def runTestPath = "BenchmarkSetup/test/run_tests.sh"
-def moduleName = ""
 pipeline {
   agent any
   options {
@@ -66,7 +65,6 @@ pipeline {
       }
       steps {
         sh "git clone https://github.com/ProofOfConceptForJuliSmoothOptimizers/BenchmarkSetup.git || true"
-        sh "git pull --ff-only origin master"
       }
     }
     stage('run tests') {
@@ -75,10 +73,9 @@ pipeline {
       }
       steps {
         script {
-          if (fileExists 'test/run_tests.sh') {
+          if (fileExists('test/run_tests.sh')) {
             runTestPath = 'test/run_tests.sh';
           }
-          moduleName = env.repo.tokenize(".")[0]
         }
         sh "chmod +x ${runTestPath}"
         sh "mkdir -p $HOME/tests/${org}/${repo}"
@@ -92,11 +89,6 @@ pipeline {
     }
     cleanup {
       sh 'printenv'
-      sh '''
-      git clean -fd
-      git reset --hard
-      rm -rf BenchmarkSetup*
-      '''
     }
   }
 }
