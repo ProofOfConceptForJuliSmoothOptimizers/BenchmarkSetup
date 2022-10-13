@@ -1,4 +1,6 @@
 def prNumber = BRANCH_NAME.tokenize("PR-")[0]
+def runTestPath = "BenchmarkSetup/test/run_tests.sh"
+def moduleName = ""
 pipeline {
   agent any
   options {
@@ -58,14 +60,29 @@ pipeline {
     )
   }
   stages {
+    stage('clone Setup') {
+      when {
+        expression { env.comment }
+      }
+      steps {
+        sh "git clone https://github.com/ProofOfConceptForJuliSmoothOptimizers/BenchmarkSetup.git || true"
+        sh "git pull --ff-only origin master"
+      }
+    }
     stage('run tests') {
       when {
         expression { env.comment }
       }
       steps {
-        sh "chmod +x test/run_tests.sh"
+        script {
+          if (fileExists 'test/run_tests.sh') {
+            runTestPath = 'test/run_tests.sh';
+          }
+          moduleName = env.repo.tokenize(".")[0]
+        }
+        sh "chmod +x ${runTestPath}"
         sh "mkdir -p $HOME/tests/${org}/${repo}"
-        sh "qsub -N ${repo}_${pullrequest}_test -V -cwd -e $HOME/tests/${org}/${repo}/${pullrequest}_${BUILD_NUMBER}_error.log test/run_tests.sh"
+        sh "qsub -N ${repo}_${pullrequest}_test -V -cwd -e $HOME/tests/${org}/${repo}/${pullrequest}_${BUILD_NUMBER}_error.log ${runTestPath}"
       }
     }
   }
@@ -78,6 +95,7 @@ pipeline {
       sh '''
       git clean -fd
       git reset --hard
+      rm -rf BenchmarkSetup*
       '''
     }
   }
