@@ -1,5 +1,8 @@
 def prNumber = BRANCH_NAME.tokenize("PR-")[0]
 def runTestPath = "BenchmarkSetup/test/run_tests.sh"
+def pattern = "[a-zA-Z0-9]+?.jl"
+def repoName = (CHANGE_URL =~ pattern)[0]
+def token = repoName.tokenize(".")[0] + "Test"
 pipeline {
   agent any
   options {
@@ -47,7 +50,7 @@ pipeline {
 
      causeString: 'Triggered on comment',
 
-     token: "",
+     token: "$token",
 
      printContributedVariables: true,
      printPostContent: true,
