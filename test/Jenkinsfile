@@ -67,7 +67,7 @@ pipeline {
         expression { env.comment }
       }
       steps {
-        sh "git clone https://github.com/ProofOfConceptForJuliSmoothOptimizers/BenchmarkSetup.git || true"
+        sh "git clone ${JENKINS_SETUP_URL} || true"
       }
     }
     stage('run tests') {
