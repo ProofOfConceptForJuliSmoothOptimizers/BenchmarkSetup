@@ -3,7 +3,7 @@
 julia --project=BenchmarkSetup BenchmarkSetup/benchmark/send_comment_to_pr.jl -o $org -r $repo -p $pullrequest -c '**Starting unit tests!**'
 
 # Specify the module to test (e.g "HSL")
-julia -E 'using Pkg; module_name = split(ENV["repo"], ".")[1]; Pkg.activate("test_env"); Pkg.develop(PackageSpec(url=joinpath("."))); Pkg.test(module_name)' &> "$org"_"$repo"_"$pullrequest".txt
+julia -E 'using Pkg; module_name = split(ENV["repo"], ".")[1]; Pkg.activate("test_env_$(pullrequest)_$(ENV[BUILD_NUMBER])"); Pkg.develop(PackageSpec(url=joinpath("."))); Pkg.test(module_name)' &> "$org"_"$repo"_"$pullrequest".txt
 
 # Create the gist and create comment on PR:
 julia BenchmarkSetup/test/send_gist_url.jl
@@ -17,3 +17,5 @@ fi
 git clean -fd
 git reset --hard
 rm -rf BenchmarkSetup*
+rm -rf test_env*
+
