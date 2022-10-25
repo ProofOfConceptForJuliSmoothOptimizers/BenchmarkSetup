@@ -1,5 +1,6 @@
 #!/bin/bash
 
+julia --project=BenchmarkSetup -E 'using Pkg; Pkg.update(); Pkg.resolve(); Pkg.instantiate()'
 julia --project=BenchmarkSetup BenchmarkSetup/benchmark/send_comment_to_pr.jl -o $org -r $repo -p $pullrequest -c '**Starting unit tests!**'
 
 # Specify the module to test (e.g "HSL")
