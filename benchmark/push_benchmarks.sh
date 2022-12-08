@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Add julia version in output of the error logs:
+>&2 echo $(julia --version)
+
 set +x
 git clean -fd
 git fetch origin
